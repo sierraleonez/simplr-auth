@@ -5,10 +5,10 @@ import (
 	"runtime"
 )
 
-func Trace_caller() {
+func Log(arg interface{}) {
 	pc, file, no, ok := runtime.Caller(1)
 	details := runtime.FuncForPC(pc)
 	if ok {
-		fmt.Println("called from", file, no, details.Name())
+		fmt.Printf("[function %s]: %s:%d \nlog: %s --\n", details.Name(), file, no, arg)
 	}
 }
