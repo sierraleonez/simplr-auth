@@ -1,17 +1,11 @@
-package routes
+package utils
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-
-	"simplr-auth/modules/auth"
-	"simplr-auth/modules/utils"
 )
 
-func Route() {
-	utils.RouteValidator("/", "GET", index)
-	http.HandleFunc("/register", auth.Register)
+type Validators struct {
 }
 
 type response struct {
@@ -20,7 +14,7 @@ type response struct {
 	Data    interface{}
 }
 
-func Middleware(pattern string, method string, handler func(http.ResponseWriter, *http.Request)) {
+func RouteValidator(pattern string, method string, handler func(http.ResponseWriter, *http.Request)) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == method {
 			handler(w, r)
@@ -37,11 +31,4 @@ func Middleware(pattern string, method string, handler func(http.ResponseWriter,
 			return
 		}
 	})
-}
-
-func register(w http.ResponseWriter, r *http.Request) {
-
-}
-func index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "health check status: ok?")
 }
