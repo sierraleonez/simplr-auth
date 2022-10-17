@@ -8,12 +8,6 @@ import (
 	"simplr-auth/routes"
 )
 
-type User struct {
-	id        int
-	firstName string
-	lastName  string
-}
-
 func main() {
 	routes.Route()
 	env, err := utils.LoadConfig()
@@ -23,7 +17,6 @@ func main() {
 	}
 	port := fmt.Sprintf(":%d", env.PORT)
 	fmt.Printf("Starting web server at http://localhost%s/", port)
-	http.ServeMux()
 	http.ListenAndServe(port, nil)
 }
 
