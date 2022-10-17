@@ -23,6 +23,7 @@ func main() {
 	}
 	port := fmt.Sprintf(":%d", env.PORT)
 	fmt.Printf("Starting web server at http://localhost%s/", port)
+	http.ServeMux()
 	http.ListenAndServe(port, nil)
 }
 
