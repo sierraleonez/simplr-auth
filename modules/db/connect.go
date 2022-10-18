@@ -14,8 +14,14 @@ func Connect() (*sql.DB, error) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Println("env: ", env.ENV)
-	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/go_database")
+	dbConfig := fmt.Sprintf(
+		"root:%s@tcp(%s:%d)/%s",
+		env.DB_PASS,
+		env.DB_HOST,
+		env.DB_PORT,
+		env.DB_NAME,
+	)
+	db, err := sql.Open("mysql", dbConfig)
 	if err != nil {
 		return nil, err
 	}

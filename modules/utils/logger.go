@@ -5,6 +5,7 @@ import (
 	"runtime"
 )
 
+// Output format: [function caller]: fileName - line number - your input
 func Log(arg interface{}) {
 	pc, file, no, ok := runtime.Caller(1)
 	details := runtime.FuncForPC(pc)

@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 	port := fmt.Sprintf(":%d", env.PORT)
-	fmt.Printf("Starting web server at http://localhost%s/", port)
+	fmt.Printf("Starting web server at http://localhost%s/\n", port)
 	http.ListenAndServe(port, nil)
 }
 

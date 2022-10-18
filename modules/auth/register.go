@@ -1,34 +1,26 @@
 package auth
 
 import (
-	"encoding/json"
 	"net/http"
+	"simplr-auth/modules/utils"
 )
 
 type User struct {
-	firstName string
-	lastName  string
-	email     string
-}
-type response struct {
-	Status  int
-	Message string
+	FirstName string `validate:"required"`
+	LastName  string `validate:"required"`
+	Email     string `validate:"required,email"`
 }
 
-func Register(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+var RequestForm User
 
-	if r.Method == "POST" {
-	} else {
-		w.WriteHeader(http.StatusBadRequest)
-		err := json.NewEncoder(w).Encode(response{
-			Status:  402,
-			Message: "unallowed method",
-		})
-		if err != nil {
-			return
-		}
-		// w.Write([]byte("Unallowed method"))
-		return
+func Register(w http.ResponseWriter, r *http.Request) (int, error) {
+	utils.Log(RequestForm)
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+	err := r.ParseForm()
+	if err != nil {
+		utils.Log(err.Error())
+		return http.StatusBadRequest, err
 	}
+
+	return http.StatusAccepted, nil
 }
