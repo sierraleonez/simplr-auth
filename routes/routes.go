@@ -20,7 +20,7 @@ var test Empty = Empty{
 }
 
 func Route() {
-	utils.RouteValidator("GET", "/", index, test)
+	// utils.RouteValidator("GET", "/", index, test)
 	utils.RouteValidator("POST", "/register", auth.Register, &auth.RequestForm)
 }
 

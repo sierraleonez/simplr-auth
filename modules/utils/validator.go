@@ -2,7 +2,6 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -21,13 +20,26 @@ type Response struct {
 	Data    interface{}
 }
 
-func RouteValidator(method string, pattern string, handler func(http.ResponseWriter, *http.Request) (int, error), responseStruct interface{}) {
+// Validate method and payload
+//
+// [method] - method of the request (GET, POST, PUT, DELETE, etc)
+//
+// [pattern] - URI path of the request (/register, /login)
+//
+// [handler] - handler function to be executed
+//
+// [responseStruct] - pointer to instance of the request struct
+func RouteValidator(method string, pattern string, handler func(http.ResponseWriter, *http.Request) (int, interface{}, interface{}), responseStruct interface{}) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+
 		var result Response
 		jsonEnc := json.NewEncoder(w)
 		decoder := schema.NewDecoder()
 		validate := validator.New()
 		if r.Method == method {
+
 			// Map the response to struct following predefined schema
 			r.ParseForm()
 			err := decoder.Decode(responseStruct, r.Form)
@@ -38,7 +50,7 @@ func RouteValidator(method string, pattern string, handler func(http.ResponseWri
 				})
 				return
 			}
-			fmt.Println(responseStruct)
+
 			// Validate the response payload following predefined schema
 			err = validate.Struct(responseStruct)
 			if err != nil {
@@ -49,11 +61,11 @@ func RouteValidator(method string, pattern string, handler func(http.ResponseWri
 				return
 			}
 
-			code, err := handler(w, r)
+			code, message, data := handler(w, r)
 			result = Response{
-				Message: err,
+				Message: message,
 				Code:    code,
-				// Data:    data,
+				Data:    data,
 			}
 			jsonEnc.Encode(result)
 		} else {
