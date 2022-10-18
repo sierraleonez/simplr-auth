@@ -10,12 +10,12 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func GenerateJWT() (string, error) {
+func GenerateJWT(data interface{}) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["exp"] = json.Number(strconv.FormatInt(time.Now().Add(time.Hour*time.Duration(1)).Unix(), 10))
 	claims["authorized"] = true
-	claims["user"] = "username"
+	claims["user"] = data
 
 	tokenString, err := token.SignedString([]byte("test"))
 	if err != nil {
@@ -32,7 +32,7 @@ func VerifyJWT(endpointHandler func(writer http.ResponseWriter, request *http.Re
 				_, ok := token.Method.(*jwt.SigningMethodECDSA)
 				if !ok {
 					writer.WriteHeader((http.StatusUnauthorized))
-					_, err := writer.Write([]byte("You are unauthorized"))
+					_, err := writer.Write([]byte("Invalid token"))
 					if err != nil {
 						return nil, err
 					}
