@@ -22,14 +22,17 @@ type Response struct {
 
 // Validate method and payload
 //
+// GET method only able to make use of URL Query parameter and unable to make use of form value parameter,
+// Other method should have their payload encoded in x-www-form-urlencoded
+//
 // [method] - method of the request (GET, POST, PUT, DELETE, etc)
 //
 // [pattern] - URI path of the request (/register, /login)
 //
 // [handler] - handler function to be executed
 //
-// [responseStruct] - pointer to instance of the request struct
-func RouteValidator(method string, pattern string, handler func(http.ResponseWriter, *http.Request) (int, interface{}, interface{}), responseStruct interface{}) {
+// [requestStruct] - pointer to instance of the request struct
+func RouteValidator(method string, pattern string, handler func(http.ResponseWriter, *http.Request) (int, interface{}, interface{}), requestStruct interface{}) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
@@ -38,11 +41,11 @@ func RouteValidator(method string, pattern string, handler func(http.ResponseWri
 		jsonEnc := json.NewEncoder(w)
 		decoder := schema.NewDecoder()
 		validate := validator.New()
-		if r.Method == method {
 
+		if r.Method == method {
 			// Map the response to struct following predefined schema
 			r.ParseForm()
-			err := decoder.Decode(responseStruct, r.Form)
+			err := decoder.Decode(requestStruct, r.Form)
 			if err != nil {
 				jsonEnc.Encode(Response{
 					Message: err.Error(),
@@ -52,7 +55,7 @@ func RouteValidator(method string, pattern string, handler func(http.ResponseWri
 			}
 
 			// Validate the response payload following predefined schema
-			err = validate.Struct(responseStruct)
+			err = validate.Struct(requestStruct)
 			if err != nil {
 				jsonEnc.Encode(Response{
 					Message: err.Error(),
@@ -61,6 +64,7 @@ func RouteValidator(method string, pattern string, handler func(http.ResponseWri
 				return
 			}
 
+			// Execute handler method and retrieve the result (if exist)
 			code, message, data := handler(w, r)
 			result = Response{
 				Message: message,
@@ -68,6 +72,7 @@ func RouteValidator(method string, pattern string, handler func(http.ResponseWri
 				Data:    data,
 			}
 			jsonEnc.Encode(result)
+
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
 			err := jsonEnc.Encode(response{
