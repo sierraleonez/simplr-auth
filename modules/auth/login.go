@@ -41,12 +41,13 @@ func Login(w http.ResponseWriter, r *http.Request) (int, interface{}, interface{
 		return http.StatusUnauthorized, errors.New("password unmatched"), nil
 	}
 
-	// if true, create jwt
+	// password matched, create jwt
 	token, err := utils.GenerateJWT(user)
+
 	if err != nil {
 		utils.Log(err)
 		return http.StatusInternalServerError, errors.New("unable to create token"), nil
 	}
 
-	return http.StatusAccepted, fmt.Sprintf("Hello, %s", user.Email), token
+	return http.StatusAccepted, fmt.Sprintf("Hello, %s", user.Email), model.LoginResponse{Token: token}
 }
