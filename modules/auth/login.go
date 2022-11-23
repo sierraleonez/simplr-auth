@@ -32,13 +32,14 @@ func Login(w http.ResponseWriter, r *http.Request) (int, interface{}, interface{
 	})
 
 	if err != nil {
+		fmt.Println("error here")
 		return http.StatusInternalServerError, err.Error(), nil
 	}
 
 	// compare request.password with DB.password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(LoginRequestForm.Password))
 	if err != nil {
-		return http.StatusUnauthorized, errors.New("password unmatched"), nil
+		return http.StatusUnauthorized, utils.Error("password unmatched"), nil
 	}
 
 	// password matched, create jwt
@@ -46,7 +47,7 @@ func Login(w http.ResponseWriter, r *http.Request) (int, interface{}, interface{
 
 	if err != nil {
 		utils.Log(err)
-		return http.StatusInternalServerError, errors.New("unable to create token"), nil
+		return http.StatusInternalServerError, utils.Error("unable to create token"), nil
 	}
 
 	return http.StatusAccepted, fmt.Sprintf("Hello, %s", user.Email), model.LoginResponse{Token: token}

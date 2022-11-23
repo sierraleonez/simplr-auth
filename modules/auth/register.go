@@ -55,5 +55,5 @@ func Register(w http.ResponseWriter, r *http.Request) (int, interface{}, interfa
 		utils.Log(insertRes)
 	}
 
-	return http.StatusAccepted, "User registered", RequestForm
+	return http.StatusAccepted, "User registered", nil
 }
