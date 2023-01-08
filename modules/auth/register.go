@@ -40,7 +40,7 @@ func Register(w http.ResponseWriter, r *http.Request) (int, interface{}, interfa
 		if err != nil {
 			return http.StatusInternalServerError, err, nil
 		}
-		insertRes, err := customQuery.QueryRow(func(dbArg *sql.DB) (res interface{}, err error) {
+		_, err = customQuery.QueryRow(func(dbArg *sql.DB) (res interface{}, err error) {
 			res, err = dbArg.Exec("INSERT INTO users (firstName, lastName, email, password) values(?, ?, ?, ?)", RequestForm.FirstName, RequestForm.LastName, RequestForm.Email, hashedPass)
 			if err != nil {
 				return nil, err
@@ -52,7 +52,6 @@ func Register(w http.ResponseWriter, r *http.Request) (int, interface{}, interfa
 			utils.Log(err.Error())
 			return http.StatusInternalServerError, err.Error(), nil
 		}
-		utils.Log(insertRes)
 	}
 
 	return http.StatusAccepted, "User registered", nil

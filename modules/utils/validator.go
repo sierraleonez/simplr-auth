@@ -36,9 +36,8 @@ func RouteValidator(method string, pattern string, handler func(http.ResponseWri
 		var result Response
 		decoder := schema.NewDecoder()
 		validate := validator.New()
-
 		if r.Method == method {
-			// Map the response to struct following predefined schema
+			// Map the request body to struct following predefined schema
 			r.ParseForm()
 			err := decoder.Decode(requestStruct, r.Form)
 			if err != nil {
