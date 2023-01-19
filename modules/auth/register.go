@@ -11,7 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var RequestForm model.User
+var RequestForm model.RegisterRequest
 
 func Register(w http.ResponseWriter, r *http.Request) (int, interface{}, interface{}) {
 	// Check if user with registered email existed in DB

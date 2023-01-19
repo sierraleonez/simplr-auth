@@ -13,6 +13,7 @@ import (
 func GenerateJWT(data interface{}) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
+	// Token expiration: 1 hour
 	claims["exp"] = json.Number(strconv.FormatInt(time.Now().Add(time.Hour*time.Duration(1)).Unix(), 10))
 	claims["authorized"] = true
 	claims["user"] = data

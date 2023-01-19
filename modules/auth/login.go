@@ -16,11 +16,12 @@ var LoginRequestForm model.LoginRequest
 
 func Login(w http.ResponseWriter, r *http.Request) (int, interface{}, interface{}) {
 	// select email and password from DB where email = request.email
-	var user model.LoginRequest
+	var user model.User
+	var password string
 	_, err := query.QueryRow(func(dbArg *sql.DB) (res interface{}, err error) {
 		err = dbArg.
-			QueryRow("SELECT email, password FROM users WHERE email=?", LoginRequestForm.Email).
-			Scan(&user.Email, &user.Password)
+			QueryRow("SELECT id, email, password FROM users WHERE email=?", LoginRequestForm.Email).
+			Scan(&user.Id, &user.Email, &password)
 
 			// else, return error unidentified user
 		if err != nil {
@@ -37,7 +38,7 @@ func Login(w http.ResponseWriter, r *http.Request) (int, interface{}, interface{
 	}
 
 	// compare request.password with DB.password
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(LoginRequestForm.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(password), []byte(LoginRequestForm.Password))
 	if err != nil {
 		return http.StatusUnauthorized, utils.Error("password unmatched"), nil
 	}

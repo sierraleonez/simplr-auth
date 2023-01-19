@@ -26,16 +26,28 @@ type Response struct {
 // [handler] - handler function to be executed
 //
 // [requestStruct] - pointer to instance of the request struct
-func RouteValidator(method string, pattern string, handler func(http.ResponseWriter, *http.Request) (int, interface{}, interface{}), requestStruct interface{}) {
+func RouteValidator(method string, pattern string, isProtected bool, handler func(http.ResponseWriter, *http.Request) (int, interface{}, interface{}), requestStruct interface{}) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		// Handle CORS, allow all origin
-		EnableCors(&w)
-
-		w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
-
 		var result Response
 		decoder := schema.NewDecoder()
 		validate := validator.New()
+
+		// Handle CORS, allow all origin
+		EnableCors(&w)
+
+		// Check token in request if route is protected
+		if isProtected {
+			_, err := AuthorizationCheck(w, r)
+			if err != nil {
+				CreateResponse(w, Response{
+					Message: err.Error(),
+					Code:    http.StatusUnauthorized,
+				})
+			}
+		}
+
+		w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+
 		if r.Method == method {
 			// Map the request body to struct following predefined schema
 			r.ParseForm()
