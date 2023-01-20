@@ -11,6 +11,11 @@ import (
 )
 
 func GenerateJWT(data interface{}) (string, error) {
+	env, err := LoadConfig()
+	if err != nil {
+		return "", err
+	}
+
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	// Token expiration: 1 hour
@@ -18,7 +23,7 @@ func GenerateJWT(data interface{}) (string, error) {
 	claims["authorized"] = true
 	claims["user"] = data
 
-	tokenString, err := token.SignedString([]byte("test"))
+	tokenString, err := token.SignedString([]byte(env.SECRET_TOKEN))
 	if err != nil {
 		return "", err
 	}

@@ -43,6 +43,7 @@ func RouteValidator(method string, pattern string, isProtected bool, handler fun
 					Message: err.Error(),
 					Code:    http.StatusUnauthorized,
 				})
+				return
 			}
 		}
 
